@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}body{margin:0}</style></head><body>
-<title>화석 발굴 탐험대</title>
+<title>해마루 탐험대</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,6 +59,8 @@ h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;text-wrap:balance
 @media (max-width:560px){.how{grid-template-columns:1fr}}
 .how div{border-top:3px solid var(--line);padding-top:8px}
 .how b{color:var(--ink);display:block}
+.credit{font-size:.9rem;color:var(--muted);letter-spacing:.04em}
+.credit-map{font-size:.8rem;color:var(--muted)}
 
 /* ---------- 지도 화면 ---------- */
 .topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--panel);border-bottom:1px solid var(--line)}
@@ -174,7 +176,7 @@ kbd{font-family:var(--f-body);background:var(--bg);border:1px solid var(--line);
     <div class="logo">
       <canvas id="logo" width="168" height="168" aria-hidden="true"></canvas>
       <div>
-        <h1>화석 발굴 탐험대</h1>
+        <h1>해마루 탐험대</h1>
         <p>세계 지도를 따라 지층을 파 내려가고, 흩어진 화석 조각을 모아 보세요.</p>
       </div>
     </div>
@@ -192,7 +194,7 @@ kbd{font-family:var(--f-body);background:var(--bg);border:1px solid var(--line);
       <div><b>3. 조각 모으기</b>스테이지가 오를수록 화석이 더 많은 조각으로 흩어져요.</div>
     </div>
     <div class="row" style="justify-content:space-between;align-items:center">
-      <span class="prog" id="titleProg"></span>
+      <span style="display:grid;gap:2px"><span class="prog" id="titleProg"></span><span class="credit">제작 · 전준화</span></span>
       <button class="btn primary" id="goMap">탐험 시작</button>
     </div>
   </div>
@@ -225,6 +227,7 @@ kbd{font-family:var(--f-body);background:var(--bg);border:1px solid var(--line);
       <span class="spacer"></span>
       <label><input type="checkbox" id="unlockAll"> 교사용: 모든 지역 열기</label>
       <button class="btn small" id="resetBtn">기록 초기화</button>
+      <span class="credit-map">제작 · 전준화</span>
     </div>
   </div>
 </section>
