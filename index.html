@@ -338,7 +338,7 @@ kbd{font-family:var(--f-body);background:var(--bg);border:1px solid var(--line);
       <h2>동물 팡팡</h2>
       <button class="btn small" id="miniBack">탐험으로</button>
     </div>
-    <p class="mini-sub">같은 동물 4마리를 가로·세로 한 줄이나 2×2 네모로 모으면 팡! 사라져요.</p>
+    <p class="mini-sub">같은 동물 4마리를 2×2 정사각형으로 모으면 팡! 사라져요.</p>
     <div class="seg" id="miniLv" role="group" aria-label="난이도" style="justify-self:start">
       <button data-d="easy">쉬움</button><button data-d="normal">보통</button><button data-d="hard">어려움</button>
     </div>
@@ -357,7 +357,7 @@ kbd{font-family:var(--f-body);background:var(--bg);border:1px solid var(--line);
     <div class="mini-rule"><b>게임 방법</b>
       <ol>
         <li>붙어 있는 동물 두 마리를 차례로 누르거나, 끌어서 자리를 바꿔요.</li>
-        <li>같은 동물 4마리가 <b>가로 한 줄, 세로 한 줄, 2×2 네모</b>를 이루면 사라져요.</li>
+        <li>같은 동물 4마리가 <b>2×2 정사각형</b>을 이루면 사라져요. 가로나 세로 한 줄은 사라지지 않아요.</li>
         <li>사라진 자리는 위 동물이 내려와 채우고, 또 모이면 연속 팡(콤보)!</li>
         <li>이동 횟수를 다 쓰면 끝나요. 쉬움은 동물 종류가 적고 이동이 많아요.</li>
       </ol>
@@ -955,11 +955,9 @@ function mkTile(t,r,c,fromRow){const el=document.createElement('div');el.classNa
   const o={t,el,id:++uid};place(o,fromRow!=null?fromRow:r,c);board.appendChild(el);return o}
 function place(o,r,c){o.el.style.top=(r*100/ROWS)+'%';o.el.style.left=(c*100/COLS)+'%';o.el.dataset.r=r;o.el.dataset.c=c}
 function at(r,c){return r>=0&&r<ROWS&&c>=0&&c<COLS?grid[r][c]:null}
-/* 매치 찾기: 가로 4+, 세로 4+, 2x2 */
+/* 매치 찾기: 2×2 정사각형만 제거, 겹치는 칸은 한 번만 처리 */
 function findMatches(g){
   const T=(r,c)=>g[r]&&g[r][c]?g[r][c].t:-1;const hit=new Set();
-  for(let r=0;r<ROWS;r++){let s=0;for(let c=1;c<=COLS;c++){if(c<COLS&&T(r,c)===T(r,s)&&T(r,s)>=0)continue;if(c-s>=4)for(let k=s;k<c;k++)hit.add(r*COLS+k);s=c}}
-  for(let c=0;c<COLS;c++){let s=0;for(let r=1;r<=ROWS;r++){if(r<ROWS&&T(r,c)===T(s,c)&&T(s,c)>=0)continue;if(r-s>=4)for(let k=s;k<r;k++)hit.add(k*COLS+c);s=r}}
   for(let r=0;r<ROWS-1;r++)for(let c=0;c<COLS-1;c++){const t=T(r,c);if(t>=0&&T(r,c+1)===t&&T(r+1,c)===t&&T(r+1,c+1)===t)[r*COLS+c,r*COLS+c+1,(r+1)*COLS+c,(r+1)*COLS+c+1].forEach(i=>hit.add(i))}
   return hit}
 function swapIn(g,a,b){const t=g[a[0]][a[1]];g[a[0]][a[1]]=g[b[0]][b[1]];g[b[0]][b[1]]=t}
@@ -967,8 +965,6 @@ function findMove(){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)for(const[dr,d
   swapIn(grid,[r,c],[r2,c2]);const ok=findMatches(grid).size>0;swapIn(grid,[r,c],[r2,c2]);if(ok)return[[r,c],[r2,c2]]}return null}
 function fillRandom(){const n=DIFF[diff].types;let tries=0;
   do{tries++;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){let t;do{t=rnd(n)}while(
-     (c>=3&&grid[r][c-1].t===t&&grid[r][c-2].t===t&&grid[r][c-3].t===t)||
-     (r>=3&&grid[r-1][c].t===t&&grid[r-2][c].t===t&&grid[r-3][c].t===t)||
      (r>=1&&c>=1&&grid[r-1][c].t===t&&grid[r][c-1].t===t&&grid[r-1][c-1].t===t));grid[r][c].t=t}}
   while((findMatches(grid).size||!findMove())&&tries<200)}
 function paint(o){o.el.firstChild.textContent=ANIMALS[o.t][0];o.el.firstChild.style.background=ANIMALS[o.t][1]}
@@ -985,7 +981,7 @@ async function trySwap(a,b){
   if(busy||moves<=0)return;busy=true;clearSel();
   const A=grid[a[0]][a[1]],B=grid[b[0]][b[1]];
   swapIn(grid,a,b);place(A,b[0],b[1]);place(B,a[0],a[1]);await wait(210);
-  if(!findMatches(grid).size){swapIn(grid,a,b);place(A,a[0],a[1]);place(B,b[0],b[1]);sfx('no');msg('4마리가 모이지 않아요. 다시 해 보세요!');await wait(210);busy=false;return}
+  if(!findMatches(grid).size){swapIn(grid,a,b);place(A,a[0],a[1]);place(B,b[0],b[1]);sfx('no');msg('2×2 정사각형이 되지 않아요. 다시 해 보세요!');await wait(210);busy=false;return}
   moves--;stats();await resolve();busy=false;
   if(moves<=0)return endGame();
   if(!findMove()){msg('바꿀 곳이 없어서 새로 섞었어요');reshuffle()}
